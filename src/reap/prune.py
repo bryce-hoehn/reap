@@ -180,10 +180,10 @@ def prune(
             ]
             moe.experts.down_proj.data = moe.experts.down_proj[retained_expert_indicies]
             moe.num_experts = len(retained_expert_indicies)
-            moe.router.weight.data = moe.router.weight.data[retained_expert_indicies]
-            moe.router.out_features = len(retained_expert_indicies)
-            if hasattr(moe.router, "num_experts"):  # transformers >= 4.54+
-                moe.router.num_experts = len(retained_expert_indicies)
+            moe.gate.weight.data = moe.gate.weight.data[retained_expert_indicies]
+            moe.gate.out_features = len(retained_expert_indicies)
+            if hasattr(moe.gate, "num_experts"):  # transformers >= 4.54+
+                moe.gate.num_experts = len(retained_expert_indicies)
 
     # patch config and dump
     logger.info("Saving pruned model...")
@@ -259,7 +259,6 @@ def main():
         torch_dtype="auto",
         trust_remote_code=True,
         local_files_only=False,
-        load_in_8bit=True,
     )
     # record activations or load previously recorded activations
     logger.info(
