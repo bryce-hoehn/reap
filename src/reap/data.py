@@ -423,18 +423,22 @@ class WritingPromptsChatDataset(ChatDatasetProcessor):
 
 class GLM47Dataset(ChatDatasetProcessor):
     """Dataset for 0xSero/glm47-reap-calibration-v2."""
+    
+    category_field = None
 
-    category_field: str = None  # or set to something if you have categories
+    def __init__(self, dataset_name, split, tokenizer, **kwargs):
+        super().__init__(dataset_name, split, tokenizer, **kwargs)
+        self.dataset = self.dataset.map(self._map_fn)
+        self.messages_field = "messages"
 
     @staticmethod
-    def _map_fn(sample: dict[str, any]) -> dict[str, any]:
+    def _map_fn(sample):
         return {
             "messages": [
                 {"role": "user", "content": sample["instruction"]},
                 {"role": "assistant", "content": sample["output"]}
             ]
         }
-
 DATASET_REGISTRY: dict[str, BaseDatasetProcessor] = {
     "m-a-p/CodeFeedback-Filtered-Instruction": CodeFeedbackChatDataset,
     "allenai/tulu-3-sft-mixture": TuluSFTMixtureChatDataset,
