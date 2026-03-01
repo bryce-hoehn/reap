@@ -185,8 +185,20 @@ def prune(
             if hasattr(moe.gate, "num_experts"):  # transformers >= 4.54+
                 moe.gate.num_experts = len(retained_expert_indicies)
 
-    # patch config and dump
+    # After pruning all layers, move model to CPU to avoid offloading issues during save
+    logger.info("Moving model to CPU and removing offloading hooks for saving...")
+    # Remove accelerate hooks that manage offloading
+    from accelerate.hooks import remove_hook_from_module
+    remove_hook_from_module(model, recurse=True)
+    # Move all parameters to CPU
+    model = model.cpu()
+    # Force garbage collection to free GPU memory
+    import gc
+    gc.collect()
+    torch.cuda.empty_cache()
+
     logger.info("Saving pruned model...")
+    
     retained_experts = len(retained_expert_indicies)
     setattr(model.config, model_attrs["num_experts"], retained_experts)
     if model.__class__.__name__ == "Ernie4_5_MoeForCausalLM":  # remote-code verson
