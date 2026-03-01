@@ -425,7 +425,14 @@ class GLM47Dataset(ChatDatasetProcessor):
     """Dataset for 0xSero/glm47-reap-calibration-v2."""
     
     category_field = None
-    messages_field = "messages"
+    messages_field = "messages"  # Tell the base class which field contains messages
+
+    def __init__(self, dataset_name, split, tokenizer, **kwargs):
+        super().__init__(dataset_name, split, tokenizer, **kwargs)
+        # Apply mapping to create 'messages' field
+        self.dataset = self.dataset.map(self._map_fn)
+        # Also update the mapped dataset cache if used elsewhere
+        self._mapped_dataset = self.dataset
 
     @staticmethod
     def _map_fn(sample: dict[str, any]) -> dict[str, any]:
