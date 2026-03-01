@@ -5,6 +5,16 @@ logger = logging.getLogger(__name__)
 
 
 MODEL_ATTRS = {
+    "Qwen3_5MoeForCausalLM": {
+        "moe_block": "mlp",
+        "gate_proj": "gate_up_proj",
+        "down_proj": "down_proj",
+        "experts": "experts",
+        "fused": True,
+        "router": "gate",
+        "num_experts": "num_experts",
+        "num_experts_per_tok": "num_experts_per_tok",
+    },
     "Qwen3MoeForCausalLM": {
         "moe_block": "mlp",
         "gate_proj": "gate_proj",

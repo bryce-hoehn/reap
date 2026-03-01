@@ -421,6 +421,14 @@ class WritingPromptsChatDataset(ChatDatasetProcessor):
             ],
         }
 
+class GLM47Dataset(ChatDatasetProcessor):
+    """Dataset for glm47-reap-calibration-v2."""
+    
+    category_field: str = None
+
+    @staticmethod
+    def _map_fn(sample: dict[str, any]) -> dict[str, any]:
+        return sample
 
 
 DATASET_REGISTRY: dict[str, BaseDatasetProcessor] = {
@@ -432,4 +440,5 @@ DATASET_REGISTRY: dict[str, BaseDatasetProcessor] = {
     "theblackcat102/evol-codealpaca-v1": CodeAlpacaChatDataset,
     "euclaise/WritingPrompts_curated": WritingPromptsChatDataset,
     "allenai/tulu-3-sft-personas-math": PersonasMathChatDataset,
+    "0xSero/glm47-reap-calibration-v2": GLM47Dataset
 }
