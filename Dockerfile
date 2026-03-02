@@ -4,6 +4,7 @@ FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
 # Install uv system-wide and create python symlink
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
+RUN source $HOME/.local/bin/env 
 # Set up the working directory
 WORKDIR /workspace
 
