@@ -267,7 +267,7 @@ def main():
     # load model
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        device_map="auto",
+        device_map="cuda:0",
         torch_dtype=torch.float16,
         trust_remote_code=True,
         local_files_only=False,
