@@ -185,14 +185,7 @@ def prune(
             if hasattr(moe.gate, "num_experts"):  # transformers >= 4.54+
                 moe.gate.num_experts = len(retained_expert_indicies)
 
-    # After pruning all layers, move model to CPU to avoid offloading issues during save
-    logger.info("Moving model to CPU for saving...")
-    # Move all parameters to CPU
-    model = model.cpu()
-    # Force garbage collection to free GPU memory
-    gc.collect()
-    torch.cuda.empty_cache()
-
+    # Update model config with new number of experts
     retained_experts = len(retained_expert_indicies)
     setattr(model.config, model_attrs["num_experts"], retained_experts)
     if model.__class__.__name__ == "Ernie4_5_MoeForCausalLM":  # remote-code verson
@@ -202,6 +195,12 @@ def prune(
             retained_experts,
         ]
 
+    # Quick check for any meta tensors (should be none, but warn if found)
+    for name, param in model.named_parameters():
+        if param.is_meta:
+            logger.warning(f"Parameter {name} is meta! This may cause issues during saving.")
+
+    # Save the pruned model directly (no CPU move)
     pruned_model_dir.mkdir(parents=True, exist_ok=True)
     start = time.time()
     model.save_pretrained(pruned_model_dir)
