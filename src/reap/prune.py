@@ -259,13 +259,13 @@ def main():
     model_name = patched_model_map(model_args.model_name)
     tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
 
-    max_memory = {0: "45GiB", 1: "45GiB"}
+    # max_memory = {0: "45GiB", 1: "45GiB"}
 
     # load model
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         device_map = "auto",
-        max_memory=max_memory,
+        # max_memory=max_memory,
         dtype=torch.float16,
         trust_remote_code=True,
         local_files_only=False,
