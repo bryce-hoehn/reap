@@ -10,7 +10,7 @@ import yaml
 
 import torch
 from tqdm import tqdm
-from transformers import AutoTokenizer, AutoModelForCausalLM, HfArgumentParser, BitsAndBytesConfig
+from transformers import AutoTokenizer, AutoModelForCausalLM, HfArgumentParser
 
 from accelerate.utils import set_seed
 from accelerate.hooks import remove_hook_from_module
@@ -259,19 +259,13 @@ def main():
     model_name = patched_model_map(model_args.model_name)
     tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
 
-    quantization_config = BitsAndBytesConfig(
-        load_in_8bit=True,
-        llm_int8_enable_fp32_cpu_offload=False,  # Keep everything on GPU if possible
-    )
-    
     # load model
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        device_map={"": 0},
+        device_map = "auto",
         dtype=torch.float16,
         trust_remote_code=True,
-        local_files_only=False,
-        quantization_config=quantization_config,
+        local_files_only=False
     )
     # record activations or load previously recorded activations
     logger.info(
