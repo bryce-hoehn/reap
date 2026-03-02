@@ -269,7 +269,6 @@ def main():
         dtype=torch.float16,
         trust_remote_code=True,
         local_files_only=False,
-        low_cpu_mem_usage=True,
     )
     # record activations or load previously recorded activations
     logger.info(
