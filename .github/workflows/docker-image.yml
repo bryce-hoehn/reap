@@ -7,13 +7,37 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+# Grant necessary permissions to push packages
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      - uses: actions/checkout@v4
+
+      # Log in to GitHub Container Registry using docker/login-action
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Build and push the Docker image
+      - name: Build and push Docker image
+        run: |
+          IMAGE_NAME=ghcr.io/${{ github.repository }}
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-8)
+
+          # Build with two tags: short commit SHA and latest
+          docker build . --file Dockerfile --tag $IMAGE_NAME:$SHORT_SHA --tag $IMAGE_NAME:latest
+
+          # Push only on push events to the main branch (avoid pushing on PRs)
+          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            docker push $IMAGE_NAME:$SHORT_SHA
+            docker push $IMAGE_NAME:latest
+          fi
