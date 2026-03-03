@@ -2,8 +2,6 @@ FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
 
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
-RUN apt update -y && apt install screen nano -y
+ENV PATH="/root/.local/bin:${PATH}"
 
-RUN source $HOME/.local/bin/env 
-
-CMD ["/bin/bash"]
+RUN apt update -y && apt install -y screen nano
